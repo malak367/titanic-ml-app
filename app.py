@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.express as px
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -51,30 +52,55 @@ with tab1:
 with tab2:
     st.subheader("Insights")
 
-    st.write("Survival Distribution")
-    st.bar_chart(df["Survived"].value_counts())
+    col1, col2 = st.columns(2)
 
-    st.write("Passenger Class Distribution")
-    st.bar_chart(df["Pclass"].value_counts())
+    with col1:
+        survival_counts = df["Survived"].value_counts()
 
-    st.write("Age Distribution")
-    st.area_chart(df["Age"])
+        fig1 = px.pie(
+            values=survival_counts.values,
+            names=["Not Survived", "Survived"],
+            title="Survival Rate",
+            color_discrete_sequence=["#ff6b6b", "#2ed573"]
+        )
+
+        st.plotly_chart(fig1, use_container_width=True)
+
+    with col2:
+        class_counts = df["Pclass"].value_counts().sort_index()
+
+        fig2 = px.pie(
+            values=class_counts.values,
+            names=["Class 1", "Class 2", "Class 3"],
+            title="Passenger Class Distribution",
+            color_discrete_sequence=["#1e90ff", "#ffa502", "#2ed573"]
+        )
+
+        st.plotly_chart(fig2, use_container_width=True)
+
+    age_fig = px.histogram(
+        df,
+        x="Age",
+        nbins=30,
+        title="Age Distribution",
+        color_discrete_sequence=["#6c5ce7"]
+    )
+
+    st.plotly_chart(age_fig, use_container_width=True)
 
 with tab3:
     st.subheader("Prediction")
 
-    pclass = st.selectbox("Pclass", [1, 2, 3])
-    sex = st.selectbox("Sex", ["male", "female"])
-    age = st.slider("Age", 1, 80, 25)
-    sibsp = st.slider("SibSp", 0, 5, 0)
-    parch = st.slider("Parch", 0, 5, 0)
-    fare = st.slider("Fare", 0.0, 500.0, 50.0)
+    pclass = st.selectbox("Passenger Class", [1, 2, 3])
+    sex = st.radio("Sex", ["male", "female"])
+    age = st.number_input("Age", min_value=1, max_value=80, value=25)
+    fare = st.number_input("Fare", min_value=0.0, value=50.0)
     embarked = st.selectbox("Embarked", ["S", "C", "Q"])
 
     sex_val = le_sex.transform([sex])[0]
     embarked_val = le_embarked.transform([embarked])[0]
 
-    input_data = np.array([[pclass, sex_val, age, sibsp, parch, fare, embarked_val]])
+    input_data = np.array([[pclass, sex_val, age, 0, 0, fare, embarked_val]])
 
     if st.button("Predict"):
         result = model.predict(input_data)[0]
