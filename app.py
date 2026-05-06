@@ -7,8 +7,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-import matplotlib.pyplot as plt
-
 st.set_page_config(page_title="Titanic App", layout="wide")
 
 df = pd.read_csv("train.csv")
@@ -26,7 +24,9 @@ features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 X = df[features]
 y = df["Survived"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
@@ -40,31 +40,31 @@ tab1, tab2, tab3 = st.tabs(["Home", "Insights", "Prediction"])
 
 with tab1:
     st.subheader("Dataset Overview")
-    st.write(df.head())
+    st.dataframe(df.head())
 
-    st.write("Model Accuracy:", acc)
+    st.metric("Model Accuracy", f"{acc:.2f}")
 
 with tab2:
-    st.subheader("Data Insights")
+    st.subheader("Insights")
 
-    fig, ax = plt.subplots()
-    df["Survived"].value_counts().plot(kind="bar", ax=ax)
-    ax.set_title("Survival Count")
-    st.pyplot(fig)
+    col1, col2 = st.columns(2)
 
-    fig2, ax2 = plt.subplots()
-    df["Pclass"].value_counts().sort_index().plot(kind="bar", ax=ax2)
-    ax2.set_title("Passenger Class Distribution")
-    st.pyplot(fig2)
+    with col1:
+        st.write("Survival Count")
+        st.write(df["Survived"].value_counts())
+
+    with col2:
+        st.write("Passenger Class Distribution")
+        st.write(df["Pclass"].value_counts())
 
 with tab3:
-    st.subheader("Make a Prediction")
+    st.subheader("Make Prediction")
 
     pclass = st.selectbox("Pclass", [1, 2, 3])
     sex = st.selectbox("Sex", ["male", "female"])
     age = st.slider("Age", 1, 80, 25)
-    sibsp = st.slider("Siblings/Spouses", 0, 5, 0)
-    parch = st.slider("Parents/Children", 0, 5, 0)
+    sibsp = st.slider("SibSp", 0, 5, 0)
+    parch = st.slider("Parch", 0, 5, 0)
     fare = st.slider("Fare", 0.0, 500.0, 50.0)
     embarked = st.selectbox("Embarked", ["S", "C", "Q"])
 
@@ -75,7 +75,8 @@ with tab3:
 
     if st.button("Predict"):
         result = model.predict(input_data)[0]
+
         if result == 1:
-            st.write("Survived")
+            st.success("Survived")
         else:
-            st.write("Not Survived")
+            st.error("Not Survived")
