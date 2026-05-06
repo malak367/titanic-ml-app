@@ -7,17 +7,17 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
+import plotly.express as px
+
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
 
 st.markdown(
     """
     <style>
-    .main {
-        background-color: #0e1117;
-        color: white;
-    }
     .block-container {
         padding-top: 2rem;
+        background-color: #0e1117;
+        color: white;
     }
     </style>
     """,
@@ -39,7 +39,9 @@ features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
 X = df[features]
 y = df["Survived"]
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
 
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
@@ -67,15 +69,38 @@ with tab2:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.write("Survival Distribution")
-        st.bar_chart(df["Survived"].value_counts())
+        survival_counts = df["Survived"].value_counts()
+
+        fig1 = px.pie(
+            values=survival_counts.values,
+            names=["Not Survived", "Survived"],
+            title="Survival Rate",
+            color_discrete_sequence=["#ff4b4b", "#00cc96"]
+        )
+
+        st.plotly_chart(fig1, use_container_width=True)
 
     with col2:
-        st.write("Passenger Class Distribution")
-        st.bar_chart(df["Pclass"].value_counts())
+        class_counts = df["Pclass"].value_counts().sort_index()
 
-    st.write("Age Distribution")
-    st.area_chart(df["Age"])
+        fig2 = px.pie(
+            values=class_counts.values,
+            names=["Class 1", "Class 2", "Class 3"],
+            title="Passenger Class Distribution",
+            color_discrete_sequence=["#636EFA", "#EF553B", "#00CC96"]
+        )
+
+        st.plotly_chart(fig2, use_container_width=True)
+
+    fig3 = px.histogram(
+        df,
+        x="Age",
+        nbins=30,
+        title="Age Distribution",
+        color_discrete_sequence=["#636EFA"]
+    )
+
+    st.plotly_chart(fig3, use_container_width=True)
 
 with tab3:
     st.subheader("Prediction")
