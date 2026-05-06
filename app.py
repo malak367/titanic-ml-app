@@ -11,15 +11,7 @@ import plotly.express as px
 
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
 
-st.markdown(
-    """
-    <style>
-    .block-container {
-        padding-top: 2rem;
-        background-color: #0e1117;
-        color: white;
-    }
-    </style>
+st.set_page_config(page_title="Titanic Dashboard", layout="wide")
     """,
     unsafe_allow_html=True
 )
