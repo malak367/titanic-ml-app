@@ -7,14 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 
-import plotly.express as px
-
 st.set_page_config(page_title="Titanic Dashboard", layout="wide")
-
-st.set_page_config(page_title="Titanic Dashboard", layout="wide")
-    """,
-    unsafe_allow_html=True
-)
 
 df = pd.read_csv("train.csv")
 
@@ -58,41 +51,14 @@ with tab1:
 with tab2:
     st.subheader("Insights")
 
-    col1, col2 = st.columns(2)
+    st.write("Survival Distribution")
+    st.bar_chart(df["Survived"].value_counts())
 
-    with col1:
-        survival_counts = df["Survived"].value_counts()
+    st.write("Passenger Class Distribution")
+    st.bar_chart(df["Pclass"].value_counts())
 
-        fig1 = px.pie(
-            values=survival_counts.values,
-            names=["Not Survived", "Survived"],
-            title="Survival Rate",
-            color_discrete_sequence=["#ff4b4b", "#00cc96"]
-        )
-
-        st.plotly_chart(fig1, use_container_width=True)
-
-    with col2:
-        class_counts = df["Pclass"].value_counts().sort_index()
-
-        fig2 = px.pie(
-            values=class_counts.values,
-            names=["Class 1", "Class 2", "Class 3"],
-            title="Passenger Class Distribution",
-            color_discrete_sequence=["#636EFA", "#EF553B", "#00CC96"]
-        )
-
-        st.plotly_chart(fig2, use_container_width=True)
-
-    fig3 = px.histogram(
-        df,
-        x="Age",
-        nbins=30,
-        title="Age Distribution",
-        color_discrete_sequence=["#636EFA"]
-    )
-
-    st.plotly_chart(fig3, use_container_width=True)
+    st.write("Age Distribution")
+    st.area_chart(df["Age"])
 
 with tab3:
     st.subheader("Prediction")
